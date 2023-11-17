@@ -4,6 +4,7 @@ const mongoose = require('./db/connection');
 const session = require('express-session');
 const cors = require('cors')
 const authController = require('./controllers/authController')
+const eventController =  require('./controllers/eventController')
 
 require('dotenv').config()
 
@@ -17,6 +18,8 @@ app.use(session({ secret: "yerrr", cookie: {maxAge: 3600000}, resave: false, sav
 app.use(express.json());
 
 app.use('/', authController)
+app.use('/event', eventController)
+
 
 // own middleware for checking logged in
 app.use((req, res, next) => {
