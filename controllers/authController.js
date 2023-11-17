@@ -1,73 +1,64 @@
-const express = require('express');
-const router = express.Router()
-const User = require('../models/user')
-const bcrypt = require('bcrypt')
+const express = require("express");
+const bcrypt = require("bcrypt");
+const router = express.Router();
+const User = require('../models/user');
+require("dotenv").config();
 
-// LOGIN
-router.get('/login', (req, res) => {
-    res.render('auth/login')
-})
 
-router.get('/profile', async (req, res) => {
-    const user = await User.findOne({ userId: req.params.userId});
-    res.render('auth/profile', {
-        user
-    })
-})
+router.get("/", (req, res) => {
+  res.send("login");
+});
 
-router.post('/login', async (req, res) => {
-    console.log(req.body);
+router.post("/login", async (req, res) => {
+  console.log(req.body);
+
+  let userToLogin = await User.findOne({ username: req.body.username });
+  console.log(userToLogin);
+  if (userToLogin) {
+    bcrypt.compare(req.body.password, userToLogin.password, (err, result) => {
+      if (result) {
+        const id = userToLogin._id.toHexString();
+        req.session.userid = id
+        res.json({
+          message: "success",
+          userid: req.session.userid
+        });
+      } else {
+        res.json("Incorrect Password");
+      }
+    });
+  }
+});
+
+router.get("/signup", (req, res) => {
+  res.render("auth/signup");
+});
+
+router.post("/signup", async (req, res) => {
+  if (req.body.username && req.body.password) {
+    let plainTextPassword = req.body.password;
+    bcrypt.hash(plainTextPassword, 5 , async (err, hashedPassword) => {
+      req.body.password = hashedPassword;
+      let newUser = await User.create(req.body);
     
-    let userToLogin = await User.findOne({ username: req.body.username})
-
-    if (userToLogin) {
-        bcrypt.compare(req.body.password, userToLogin.password, (err, result) => {
-            if(result){
-                req.session.userId = userToLogin._id
-                req.session.name = userToLogin.name;
-                res.redirect('/events/userEvents')
-            } else {
-                res.send('no can do ')
-            }
-        });
-    }
+      res.send(newUser);
+    });
+  }
 });
 
-
-
-router.post('/signup', async (req, res) => {
-    if (req.body.username && req.body.password) {
-        let plainTextPass = req.body.password
-        bcrypt.hash(plainTextPass, 10, async (err, hashedPass) => {
-            req.body.password = hashedPass
-            let newUser = await User.create(req.body)
-            res.send(newUser)
-
-        });
-        res.redirect('/events')
-    }
+router.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.redirect("/");
 });
 
-// SIGN UP
-router.get('/signup', (req, res) => {
-    res.render('auth/signup')
-})
-
-router.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
-})
-
-const requireLogin = (req, res, next) => {
-    if (!req.session.userId) {
-        return res.redirect('/login');
+router.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send("failed logout");
     }
-    next();
-};
+    res.clearCookie("connect.sid"); 
+    return res.send("successful logout!");
+  });
+});
 
-// router.get('/profile/:userId', requireLogin, async (req,res) => {
-//     const user = await User.findOne({ userId: req.params.userId});
-//     console.log(user)
-// })
-
-module.exports = router
+module.exports = router;

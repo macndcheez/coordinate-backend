@@ -1,17 +1,13 @@
-// require mongoose to tell it which database to connect to 
+require('dotenv').config();
 const mongoose = require('mongoose');
-require('dotenv').config()
-mongoose.connect(
-    process.env.MONGODB_URI
-);
 
-// check for connection or error
-mongoose.connection.on('connected',  () => {
-    console.log('WAHOOO mongodb connected!!!')
-})
+mongoose.connect(process.env.MONGODB_URI, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+});
 
-mongoose.connection.on('error', err => {
-    console.log('nauurr error', err)
-})
-
-module.exports = mongoose;
+mongoose.connection
+    .on('open', () => console.log('WAHOOOO we connected'))
+    .on('close', () => console.log('NAUURR u r not connected'))
+    .on('error', (e) => console.log('matey error yo', e))
+module.exports = mongoose
