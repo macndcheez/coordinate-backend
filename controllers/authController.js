@@ -20,7 +20,6 @@ router.post("/login", async (req, res) => {
         const id = userToLogin._id.toHexString();
         req.session.userid = id
         res.json({
-          message: "success",
           userid: req.session.userid
         });
       } else {
@@ -57,7 +56,7 @@ router.post("/logout", (req, res) => {
       return res.status(500).send("failed logout");
     }
     res.clearCookie("connect.sid"); 
-    return res.send("successful logout!");
+    return res.send("successful logout!");  
   });
 });
 
