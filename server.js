@@ -4,7 +4,7 @@ const mongoose = require('./db/connection');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const cors = require('cors');
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: 'https://coordinate-4ppv.onrender.com', credentials: true }));
 const authController = require('./controllers/authController');
 const eventController = require('./controllers/eventController');
 
