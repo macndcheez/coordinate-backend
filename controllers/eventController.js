@@ -9,7 +9,7 @@ const {customAlphabet} = require('nanoid');
 
 router.get('/new', async (req, res) => {
     let events = await Event.find();
-    res.render('/event/new')
+    res.render('new')
 })
 
 router.get('/edit/:id', async (req,res) => {
@@ -22,6 +22,15 @@ router.post('/new', async (req, res) => {
 
     const {eventName, calendarDuration} = req.body
     const durationMonths = parseInt(calendarDuration)
+
+    if (!eventName) {
+        return res.status(400).send('event name is required')
+    }
+
+    if (isNaN(durationMonths) || durationMonths <= 0) {
+        return res.status(400).send('invalid duration')
+    }
+
     
     const nanoid = customAlphabet(
         '01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 
@@ -34,13 +43,13 @@ router.post('/new', async (req, res) => {
         calendarDuration: durationMonths,
         eventCreatedAt: new Date(),
         uniqueUrl: eventId,
-        user: req.session.userId
+        user: req.session.userid
     });
 
     await newEvent.save();
 
 
-    res.redirect(`/event/${eventId}?calendarDuration=${durationMonths}&eventName=${eventName}`)
+    res.json(newEvent)
 });
 
 router.get('/delete/:eventId', async (req, res) => {
@@ -48,7 +57,7 @@ router.get('/delete/:eventId', async (req, res) => {
 
     const eventToDelete = await Event.findByIdAndDelete(eventIdDelete)
 
-    res.redirect('/home')
+    res.json('/home')
 })
 
 router.post('/edit/:eventId', async (req, res) => {
@@ -61,7 +70,7 @@ router.post('/edit/:eventId', async (req, res) => {
     event.calendarDuration = req.body.calendarDuration
 
     await event.save();
-    res.redirect(`/event/${event.eventId}?calendarDuration=${event.calendarDuration}&eventName=${event.eventName}`)
+    res.json(`/event/${event.eventId}?calendarDuration=${event.calendarDuration}&eventName=${event.eventName}`)
 })
 
 
@@ -71,7 +80,7 @@ router.get('/:eventId', async (req, res) => {
     const calendarDuration = req.query.eventId;
     const eventName = req.query.eventName;
     console.log(eventName)
-    res.render('')
+    res.json('')
 })
 
 module.exports = router;
