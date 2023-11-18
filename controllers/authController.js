@@ -19,6 +19,7 @@ router.post("/login", async (req, res) => {
       if (result) {
         const id = userToLogin._id.toHexString();
         req.session.userid = id
+        console.log(req.session)
         res.json({
           userid: req.session.userid
         });

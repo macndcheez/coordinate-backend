@@ -48,7 +48,7 @@ router.post('/new', async (req, res) => {
     );
     const eventId = nanoid();
 
-    console.log(req.session.userid)
+    console.log(req.session)
     const newEvent = new Event({
         eventName, 
         calendarDuration: durationMonths,
