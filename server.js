@@ -26,15 +26,15 @@ app.use(express.json());
 
 app.use('/', authController);
 
-// Own middleware for checking logged in
-app.use((req, res, next) => {
-  console.log(req.session);
-  if (!req.session.userid) {
-    res.send('please log in');
-    return;
-  }
-  next();
-});
+// // Own middleware for checking logged in
+// app.use((req, res, next) => {
+//   console.log(req.session);
+//   if (!req.session.userid) {
+//     res.send('please log in');
+//     return;
+//   }
+//   next();
+// });
 
 app.use('/event', eventController);
 

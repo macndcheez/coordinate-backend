@@ -6,11 +6,21 @@ const Event = require('../models/event')
 const {customAlphabet} = require('nanoid');
 
 
+router.get('/', async (req, res) => {
+    try {
+        const events = await Event.find();
+        res.json(events);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+})
 
 router.get('/new', async (req, res) => {
     let events = await Event.find();
     res.render('new')
 })
+
 
 router.get('/edit/:id', async (req,res) => {
     const event = await Event.findOne({ uniqueUrl: req.params.eventId})
@@ -52,16 +62,24 @@ router.post('/new', async (req, res) => {
     res.json(newEvent)
 });
 
-router.get('/delete/:eventId', async (req, res) => {
-    const eventIdDelete = req.params.eventId;
+router.delete('/:uniqueUrl', async (req, res) => {
+    const uniqueUrl = req.params.uniqueUrl;
+    try {
+        const eventToDelete = await Event.findOne({ uniqueUrl });
+        if (!eventToDelete) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+        await eventToDelete.deleteOne();
+        console.log('Event deleted successfully!!!! wahooo');
+        res.json({ message: 'Event deleted successfully' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
-    const eventToDelete = await Event.findByIdAndDelete(eventIdDelete)
-
-    res.json('/home')
-})
-
-router.post('/edit/:eventId', async (req, res) => {
-    const event = await Event.findOne({ uniqueUrl: req.params.eventId})
+router.post('/edit/:uniqueUrl', async (req, res) => {
+    const event = await Event.findOne({ uniqueUrl: req.params.uniqueUrl})
     if (!event){
         return res.send('no good')
     }
@@ -70,17 +88,24 @@ router.post('/edit/:eventId', async (req, res) => {
     event.calendarDuration = req.body.calendarDuration
 
     await event.save();
-    res.json(`/event/${event.eventId}?calendarDuration=${event.calendarDuration}&eventName=${event.eventName}`)
+    res.json(`/event/${event.uniqueUrl}`)
 })
 
 
 router.get('/:uniqueUrl', async (req, res) => {
-    let events = await Event.find();
-    // const eventId = req.params.eventId;
-    const eventName = req.query.eventName;
-    console.log(eventName)
-    res.json('')
-})
+    const uniqueUrl = req.params.uniqueUrl;
+    try {
+        const event = await Event.findOne({ uniqueUrl });
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+        const eventName = event.eventName; 
+        res.json({ event, eventName });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 module.exports = router;
 
