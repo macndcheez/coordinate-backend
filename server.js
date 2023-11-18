@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('./db/connection');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const cors = require('cors');
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 const authController = require('./controllers/authController');
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: 'yerrr',
+    store: MongoStore.create({mongoUrl: MONGODB_URI}),
     cookie: { maxAge: 3600000 },
     resave: false,
     saveUninitialized: true,
