@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('./db/connection');
 const session = require('express-session');
 const cors = require('cors');
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 const authController = require('./controllers/authController');
 const eventController = require('./controllers/eventController');
 
@@ -11,7 +12,6 @@ require('dotenv').config();
 const PORT = process.env.PORT;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(
