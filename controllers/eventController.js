@@ -54,7 +54,7 @@ router.post('/new', async (req, res) => {
         calendarDuration: durationMonths,
         eventCreatedAt: new Date(),
         uniqueUrl: eventId,
-        user: req.session.userid
+        user: '6556fd17c08e1e8ed3cb4d60'
     });
 
     await newEvent.save();
