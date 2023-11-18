@@ -74,10 +74,9 @@ router.post('/edit/:eventId', async (req, res) => {
 })
 
 
-router.get('/:eventId', async (req, res) => {
+router.get('/:uniqueUrl', async (req, res) => {
     let events = await Event.find();
     // const eventId = req.params.eventId;
-    const calendarDuration = req.query.eventId;
     const eventName = req.query.eventName;
     console.log(eventName)
     res.json('')
