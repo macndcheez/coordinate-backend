@@ -5,7 +5,6 @@ const session = require('express-session');
 const cors = require('cors');
 const authController = require('./controllers/authController');
 const eventController = require('./controllers/eventController');
-const CalendarEvent = require('./models/calendarEvent'); // Import the calendarEvent model
 
 require('dotenv').config();
 
